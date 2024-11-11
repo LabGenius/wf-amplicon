@@ -57,7 +57,7 @@ docker-run:
           main.nf
           lib/common.nf
           modules/local/variant-calling.nf
-        NF_IGNORE_PROCESSES: downsampleReads,subsetReads,subsetRefFile,concatTSVs,catFastqIntoFasta
+        NF_IGNORE_PROCESSES: downsampleReads,subsetReads,subsetRefFile,concatTSVs,catFastqIntoFasta,configure_igv
     - if: $MATRIX_NAME == "ref-sample_sheet"
       variables:
         NF_WORKFLOW_OPTS: >
@@ -67,6 +67,7 @@ docker-run:
           --sample_sheet test_data/sample_sheet.csv
           --threads 2
           --combine_results
+          --igv
         NF_PROCESS_FILES: >
           main.nf
           lib/common.nf
@@ -84,7 +85,7 @@ docker-run:
           main.nf
           lib/common.nf
           modules/local/variant-calling.nf
-        NF_IGNORE_PROCESSES: downsampleReads,subsetReads,subsetRefFile,concatTSVs,catFastqIntoFasta
+        NF_IGNORE_PROCESSES: downsampleReads,subsetReads,subsetRefFile,concatTSVs,catFastqIntoFasta,configure_igv
     - if: $MATRIX_NAME == "ref-filter-all"
       variables:
         NF_WORKFLOW_OPTS: >
@@ -111,7 +112,7 @@ docker-run:
           main.nf
           lib/common.nf
           modules/local/de-novo.nf
-        NF_IGNORE_PROCESSES: downsampleBAMforMedaka,downsampleReads,racon
+        NF_IGNORE_PROCESSES: downsampleBAMforMedaka,downsampleReads,racon,configure_igv
         # make sure we got outputs for both barcodes
         AFTER_NEXTFLOW_CMD: |
           ls -p $$CI_PROJECT_NAME | grep -q barcode01/ &&
@@ -131,7 +132,7 @@ docker-run:
           main.nf
           lib/common.nf
           modules/local/de-novo.nf
-        NF_IGNORE_PROCESSES: downsampleBAMforMedaka,downsampleReads,racon
+        NF_IGNORE_PROCESSES: downsampleBAMforMedaka,downsampleReads,racon,configure_igv
         # make sure we only got outputs for barcode01
         AFTER_NEXTFLOW_CMD: |
           ls -p $$CI_PROJECT_NAME | grep -q barcode01/ &&
@@ -224,7 +225,7 @@ docker-run:
           main.nf
           lib/common.nf
           modules/local/variant-calling.nf
-        NF_IGNORE_PROCESSES: downsampleReads,subsetReads,subsetRefFile,concatTSVs,catFastqIntoFasta
+        NF_IGNORE_PROCESSES: downsampleReads,subsetReads,subsetRefFile,concatTSVs,catFastqIntoFasta,configure_igv
 
     - if: $MATRIX_NAME == "ref-no-basecall-model"
       variables:
@@ -247,7 +248,7 @@ docker-run:
           main.nf
           lib/common.nf
           modules/local/variant-calling.nf
-        NF_IGNORE_PROCESSES: downsampleReads,subsetRefFile,concatTSVs,catFastqIntoFasta
+        NF_IGNORE_PROCESSES: downsampleReads,subsetRefFile,concatTSVs,catFastqIntoFasta,configure_igv
         AFTER_NEXTFLOW_CMD: grep "Overriding basecall model with 'dna_r10.4.1_e8.2_400bps_hac@v4.3.0'." .nextflow.log
     - if: $MATRIX_NAME == "de-novo-no-basecall-model"
       variables:
@@ -264,6 +265,7 @@ docker-run:
           --fastq test_data/fastq-denovo-no-basecall-model
           --override_basecaller_cfg dna_r10.4.1_e8.2_400bps_hac@v4.3.0
           --combine_results
+          --igv
         NF_PROCESS_FILES: >
           main.nf
           lib/common.nf
