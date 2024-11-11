@@ -478,35 +478,35 @@ workflow pipeline {
         ch_to_publish = ch_to_publish
         | mix(makeReport.out | map { [it, null] } )
 
-        // create the IGV config file and add it to the publishing channel
-        igv_fnames = ch_to_publish
-        | map { path, dirname ->
-            // get a string of the relative path in the output directory after
-            // publishing the output files
-            String published_path_str = "${dirname ? "$dirname/" : ""}$path.name"
-            if (dirname) {
-                // the BAM + VCF files are published in per-sample sub-directories
-                if (path.name.endsWith(".bam") || path.name.endsWith(".vcf.gz")) {
-                    published_path_str
-                }
-            } else {
-                // the ref file and index are in the top-level output directory
-                if (path.name.endsWith(".fasta") || path.name.endsWith(".fasta.fai")) {
-                    published_path_str
+        if (params.igv) {
+            // create the IGV config file and add it to the publishing channel
+            igv_fnames = ch_to_publish
+            | map { path, dirname ->
+                // get a string of the relative path in the output directory after
+                // publishing the output files
+                String published_path_str = "${dirname ? "$dirname/" : ""}$path.name"
+                if (dirname) {
+                    // the BAM + VCF files are published in per-sample sub-directories
+                    if (path.name.endsWith(".bam") || path.name.endsWith(".vcf.gz")) {
+                        published_path_str
+                    }
+                } else {
+                    // the ref file and index are in the top-level output directory
+                    if (path.name.endsWith(".fasta") || path.name.endsWith(".fasta.fai")) {
+                        published_path_str
+                    }
                 }
             }
+            | collectFile(sort: true, newLine: true)
+
+            configure_igv(
+                igv_fnames,
+                Channel.of(null),
+                [displayMode: "SQUISHED", colorBy: "strand"],
+                Channel.of(null),
+            )
         }
-        | collectFile(sort: true, newLine: true)
 
-        configure_igv(
-            igv_fnames,
-            Channel.of(null),
-            [displayMode: "SQUISHED", colorBy: "strand"],
-            Channel.of(null),
-        )
-
-        ch_to_publish = ch_to_publish
-        | mix(configure_igv.out | map { [it, null] } )
     emit:
         combined_results_to_publish = ch_to_publish
 }

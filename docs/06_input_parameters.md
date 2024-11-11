@@ -51,6 +51,7 @@
 |--------------------------|------|-------------|------|---------|
 | out_dir | string | Directory for output of all workflow results. |  | output |
 | combine_results | boolean | Whether to merge per-sample results into a single BAM / VCF file. | Per default, results are grouped per sample. With this option, an additional BAM and VCF file are produced which contain the alignments / variants for all samples and amplicons. | False |
+| igv | boolean | Enable IGV visualisation in the EPI2ME Desktop Application by creating the required files. |  | False |
 
 
 ### Advanced Options

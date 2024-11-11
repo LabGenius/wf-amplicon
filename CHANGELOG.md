@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Reconcile template with v5.3.0 and v5.3.1
+- IGV output files are only output if `--igv` is used
 
 ## [v1.1.3]
 ### Fixed
