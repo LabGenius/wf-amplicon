@@ -41,6 +41,7 @@ process getVersions {
 }
 
 process addMedakaToVersionsFile {
+    publishDir "${params.out_dir}", mode: 'copy', pattern: "versions.txt"
     label "medaka"
     cpus 1
     memory "2 GB"
@@ -55,6 +56,7 @@ process addMedakaToVersionsFile {
 
 process getParams {
     label "wfamplicon"
+    publishDir "${params.out_dir}", mode: 'copy', pattern: "params.json"
     cpus 1
     memory "2 GB"
     output:
@@ -187,6 +189,7 @@ process concatTSVs {
 
 process makeReport {
     label "wfamplicon"
+    publishDir "${params.out_dir}", mode: 'copy', pattern: "wf-amplicon-report.html"
     cpus 1
     memory "8 GB"
     input:
@@ -240,7 +243,7 @@ process catFastqIntoFasta {
 // publish files from a workflow whilst decoupling the publish from the process steps.
 // The process takes a tuple containing the filename and the name of a sub-directory to
 // put the file into. If the latter is `null`, puts it into the top-level directory.
-process output {
+process publish {
     // publish inputs to output directory
     label "wfamplicon"
     cpus 1
@@ -275,10 +278,6 @@ workflow pipeline {
         // of sub-dir to be published in | null]` (when `null`, the file will be
         // published in the top level output directory).
         ch_to_publish = Channel.empty()
-        | mix(
-            software_versions | map { [it, null] },
-            workflow_params | map { [it, null] },
-        )
 
         // drop elements in `ch_reads` that only contain a metamap (this occurs when
         // there was an entry in a sample sheet but no corresponding barcode dir)
@@ -475,8 +474,6 @@ workflow pipeline {
             software_versions,
             workflow_params,
         )
-        ch_to_publish = ch_to_publish
-        | mix(makeReport.out | map { [it, null] } )
 
         if (params.igv) {
             // create the IGV config file and add it to the publishing channel
@@ -541,7 +538,7 @@ workflow {
     pipeline.out.combined_results_to_publish
     | toList
     | flatMap
-    | output
+    | publish
 }
 
 workflow.onComplete {

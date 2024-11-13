@@ -25,7 +25,7 @@
       "type": "aggregated"
     },
     "alignments": {
-      "filepath": "./{{ alias }}/alignments/aligned.sorted.bam",
+      "filepath": "./{{ alias }}/alignments/{{ alias }}.aligned.sorted.bam",
       "title": "Alignments BAM file",
       "description": "BAM file with alignments of input reads against the references (in variant calling mode) or the created consensus (in de-novo consensus mode).",
       "mime-type": "application/gzip",
@@ -33,7 +33,7 @@
       "type": "per-sample"
     },
     "alignments-index": {
-      "filepath": "./{{ alias }}/alignments/aligned.sorted.bam.bai",
+      "filepath": "./{{ alias }}/alignments/{{ alias }}.aligned.sorted.bam.bai",
       "title": "Alignments index file",
       "description": "Index for alignments BAM file.",
       "mime-type": "application/octet-stream",
