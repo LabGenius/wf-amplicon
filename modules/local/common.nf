@@ -8,9 +8,9 @@ process alignReads {
     """
     minimap2 -t $task.cpus -ax map-ont reference.fasta reads.fastq.gz \
         -R '@RG\\tID:$meta.alias\\tSM:$meta.alias' \
-    | samtools sort -@ $task.cpus -o aligned.sorted.bam -
+    | samtools sort -@ $task.cpus -o "${meta.alias}.aligned.sorted.bam" -
 
-    samtools index aligned.sorted.bam
+    samtools index "${meta.alias}.aligned.sorted.bam"
     """
 }
 
