@@ -483,9 +483,10 @@ workflow pipeline {
                 // publishing the output files
                 String published_path_str = "${dirname ? "$dirname/" : ""}$path.name"
                 if (dirname) {
+                    String sample_name = dirname.tokenize( '/' )[0]
                     // the BAM + VCF files are published in per-sample sub-directories
                     if (path.name.endsWith(".bam") || path.name.endsWith(".vcf.gz")) {
-                        published_path_str
+                        "$sample_name,$published_path_str"
                     }
                 } else {
                     // the ref file and index are in the top-level output directory
