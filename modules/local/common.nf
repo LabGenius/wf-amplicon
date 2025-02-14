@@ -65,7 +65,7 @@ process mosdepth {
 
     # get the depths (we could add `-x`, but this loses a lot of detail from the depth
     # curves)
-    mosdepth -t $mosdepth_extra_threads -b \$window_length -n -c "\$REF_ID" depth input.bam
+    mosdepth -t $mosdepth_extra_threads -b \$window_length -n depth input.bam
     """
 }
 
@@ -89,12 +89,12 @@ process medakaConsensus {
     cpus Math.min(params.threads, 2)
     memory "8 GB"
     input:
-        tuple val(meta), path("input.bam"), path("input.bam.bai"), val(region)
+        tuple val(meta), path("input.bam"), path("input.bam.bai"), val(regions)
         val type
     output: tuple val(meta), path("consensus_probs.hdf")
     script:
     // run on a particular region if specified
-    String region_arg = region ? "--regions '$region'" : ""
+    String region_arg = regions ? "--regions ${regions.join(' ')}" : ""
     // we use `params.override_basecaller_cfg` if present; otherwise use
     // `meta.basecall_models[0]` (there should only be one value in the list because
     // we're running ingress with `allow_multiple_basecall_models: false`; note that

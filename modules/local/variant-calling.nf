@@ -231,7 +231,7 @@ workflow pipeline {
         // combination)
         ch_medaka_consensus_probs = medakaConsensus(
             // join with and transpose on the list of sanitized IDs for each sample
-            downsampleBAMforMedaka.out | join(ch_sanitized_ids) | transpose(by: 3),
+            downsampleBAMforMedaka.out | join(ch_sanitized_ids),
             "variant",
         ) | groupTuple
 
@@ -245,7 +245,7 @@ workflow pipeline {
 
         // run mosdepth on each sample--amplicon combination
         mosdepth(
-            alignReads.out | join(ch_sanitized_ids) | transpose(by: 3),
+            alignReads.out | join(ch_sanitized_ids),
             params.number_depth_windows
         )
         // concat the depth files for each sample
