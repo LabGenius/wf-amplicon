@@ -97,12 +97,12 @@ process medakaConsensus {
     cpus Math.min(params.threads, 2)
     memory "8 GB"
     input:
-        tuple val(meta), path("input.bam"), path("input.bam.bai"), val(regions)
+        tuple val(meta), path("input.bam"), path("input.bam.bai"), val(region)
         val type
     output: tuple val(meta), path("consensus_probs.hdf")
     script:
     // run on a particular region if specified
-    String region_arg = regions ? "--regions ${regions.join(' ')}" : ""
+    String region_arg = region ? "--regions '$region'" : ""
     // we use `params.override_basecaller_cfg` if present; otherwise use
     // `meta.basecall_models[0]` (there should only be one value in the list because
     // we're running ingress with `allow_multiple_basecall_models: false`; note that
