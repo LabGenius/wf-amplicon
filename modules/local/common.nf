@@ -39,6 +39,8 @@ process mosdepth {
     int mosdepth_extra_threads = task.cpus - 1
     ref_id = ref_id ?: ""
     """
+    mosdepth_options=(-t $mosdepth_extra_threads -n)
+
     REF_ID="$ref_id"
     # get ref IDs and lengths with `samtools idxstats`
     samtools idxstats input.bam > idxstats
@@ -46,15 +48,19 @@ process mosdepth {
     # if `ref_id` was `null`, assume that there was only one reference and look up its
     # ID from the idxstats
     if [ -z "\$REF_ID" ]; then
-        REF_ID=\$(head -n1 idxstats | cut -f1)
-        if [[ \$REF_ID = '*' ]]; then
+        first_contig=\$(head -n1 idxstats | cut -f1)
+        if [[ \$first_contig = '*' ]]; then
             echo "QUITTING: Only unmapped reads in 'input.bam'."
             exit 0
         fi
-    fi
 
-    # get the length of the reference
-    REF_LENGTH=\$(grep -w "\$REF_ID" idxstats | cut -f2)
+        # Use the longest reference to determine window length
+        REF_LENGTH=\$(cat idxstats | cut -f2 | sort -n | tail -1)
+    else
+        # get the length of the reference
+        REF_LENGTH=\$(grep -w "\$REF_ID" idxstats | cut -f2)
+        mosdepth_options+=(-c "\$REF_ID")
+    fi
 
     # calculate the corresponding window length (check `REF_LENGTH` first because
     # `expr a / b` returns non-zero exit code when `a < b`)
@@ -63,9 +69,11 @@ process mosdepth {
         window_length=\$(expr \$REF_LENGTH / $n_windows)
     fi
 
+    mosdepth_options+=(-b \$window_length)
+
     # get the depths (we could add `-x`, but this loses a lot of detail from the depth
     # curves)
-    mosdepth -t $mosdepth_extra_threads -b \$window_length -n depth input.bam
+    mosdepth "\${mosdepth_options[@]}" depth input.bam
     """
 }
 

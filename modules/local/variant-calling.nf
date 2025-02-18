@@ -227,12 +227,20 @@ workflow pipeline {
         }
         | downsampleBAMforMedaka
 
-        // run medaka consensus (the process will run once for each sample--amplicon
-        // combination)
+        // run medaka consensus
+        if (params.splitRef)
+            downsampleBAMforMedaka.out
+                | join(ch_sanitized_ids)
+                | transpose(by: 3)
+                | set { medakaVariantInputCh }
+        else
+            downsampleBAMforMedaka.out
+                | map { it + [false] }
+                | set { medakaVariantInputCh }
+
         ch_medaka_consensus_probs = medakaConsensus(
-            // join with and transpose on the list of sanitized IDs for each sample
-            downsampleBAMforMedaka.out | join(ch_sanitized_ids),
-            "variant",
+            medakaVariantInputCh,
+            "variant"
         ) | groupTuple
 
         // get the variants
@@ -242,12 +250,18 @@ workflow pipeline {
             | join(ch_sanitized_refs),
             params.min_coverage
         )
+        
+        // Get depth of coverage
+        if (params.splitRef)
+            alignReads.out 
+                | join(ch_sanitized_ids)
+                | transpose(by: 3)
+                | set { mosdepthInputCh }
+        else
+            alignReads.out | map { it + [false] } | set { mosdepthInputCh }
 
-        // run mosdepth on each sample--amplicon combination
-        mosdepth(
-            alignReads.out | join(ch_sanitized_ids),
-            params.number_depth_windows
-        )
+        mosdepth(mosdepthInputCh, params.number_depth_windows)
+
         // concat the depth files for each sample
         mosdepth.out
         | groupTuple
