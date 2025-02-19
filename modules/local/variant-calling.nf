@@ -228,7 +228,7 @@ workflow pipeline {
         | downsampleBAMforMedaka
 
         // run medaka consensus
-        if (params.splitRef)
+        if (params.split_ref)
             downsampleBAMforMedaka.out
                 | join(ch_sanitized_ids)
                 | transpose(by: 3)
@@ -252,7 +252,7 @@ workflow pipeline {
         )
         
         // Get depth of coverage
-        if (params.splitRef)
+        if (params.split_ref)
             alignReads.out 
                 | join(ch_sanitized_ids)
                 | transpose(by: 3)
