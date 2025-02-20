@@ -229,11 +229,13 @@ workflow pipeline {
 
         // run medaka consensus
         if (params.split_ref)
+            // Parallelise over amplicons
             downsampleBAMforMedaka.out
                 | join(ch_sanitized_ids)
                 | transpose(by: 3)
                 | set { medakaVariantInputCh }
         else
+            // Process all amplicons in one go
             downsampleBAMforMedaka.out
                 | map { it + [false] }
                 | set { medakaVariantInputCh }
@@ -253,11 +255,13 @@ workflow pipeline {
         
         // Get depth of coverage
         if (params.split_ref)
+            // Parallelise over amplicons
             alignReads.out 
                 | join(ch_sanitized_ids)
                 | transpose(by: 3)
                 | set { mosdepthInputCh }
         else
+            // Process all amplicons in one go
             alignReads.out | map { it + [false] } | set { mosdepthInputCh }
 
         mosdepth(mosdepthInputCh, params.number_depth_windows)

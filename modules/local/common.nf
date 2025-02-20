@@ -45,8 +45,8 @@ process mosdepth {
     # get ref IDs and lengths with `samtools idxstats`
     samtools idxstats input.bam > idxstats
 
-    # if `ref_id` was `null`, assume that there was only one reference and look up its
-    # ID from the idxstats
+    # if `ref_id` was `null` or `false`, use the longest reference to determine
+    # window length
     if [ -z "\$REF_ID" ]; then
         first_contig=\$(head -n1 idxstats | cut -f1)
         if [[ \$first_contig = '*' ]]; then
@@ -54,7 +54,6 @@ process mosdepth {
             exit 0
         fi
 
-        # Use the longest reference to determine window length
         REF_LENGTH=\$(cat idxstats | cut -f2 | sort -n | tail -1)
     else
         # get the length of the reference
