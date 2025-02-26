@@ -269,6 +269,13 @@
                     "default": false,
                     "description": "Enable to prevent sending a workflow ping."
                 },
+                "split_ref": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "Split reference",
+                    "description": "Run amplicons in parallel for coverage and variant calling.",
+                    "help_text": "Processing each amplicon in parallel can lead to performance bottlenecks due to the large number of jobs submitted to the scheduler."
+                },
                 "help": {
                     "type": "boolean",
                     "default": false,
